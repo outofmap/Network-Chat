@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,11 +27,15 @@ public class MultichatServer {
 			System.out.println("server is starting.");
 
 			while (true) {
+				serverSocket.setSoTimeout(180 * 1000);
 				socket = serverSocket.accept();
 				System.out.println("[" + socket.getInetAddress() + ": " + socket.getPort() + "]" + "is connected.");
 				ServerReceiver thread = new ServerReceiver(socket);
 				thread.start();
 			}
+		} catch (SocketTimeoutException timeout) {
+			System.out.println("server is closed cause of no request during the time specified.");
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
